@@ -6,9 +6,21 @@ import githubExplorer from '../../assets/githubExplorer.svg';
 
 import { Title, Form, Repositories } from './styles';
 
+// não é necessário tipar todas as informações retornadas, apenas do que é utilizado
+interface Repository {
+  // eslint-disable-next-line camelcase
+  full_name: string;
+  description: string;
+  owner: {
+    login: string;
+    // eslint-disable-next-line camelcase
+    avatar_url: string;
+  };
+}
+
 const Dashboard: React.FC = () => {
   const [newRepo, setNewRepo] = useState('');
-  const [repositories, serRepositories] = useState([]);
+  const [repositories, setRepositories] = useState<Repository[]>([]);
 
   async function handleAddRepository(
     event: FormEvent<HTMLFormElement>,
@@ -16,7 +28,12 @@ const Dashboard: React.FC = () => {
     // Add de um novo repo
     // consumir api do github
     event.preventDefault();
-    const response = await api.get(`repos/${newRepo}`);
+    const response = await api.get<Repository>(`repos/${newRepo}`);
+
+    const repository = response.data;
+
+    setRepositories([...repositories, repository]);
+    setNewRepo('');
   }
 
   return (
@@ -34,18 +51,20 @@ const Dashboard: React.FC = () => {
       </Form>
 
       <Repositories>
-        <a href="teste">
-          <img
-            src="https://avatars.githubusercontent.com/u/40959653?v=4"
-            alt="Paulo Vitor"
-          />
-          <div>
-            <strong>Rocketseat/Unform</strong>
-            <p>Easy etc etc etc</p>
-          </div>
+        {repositories.map(repository => (
+          <a key={repository.full_name} href="teste">
+            <img
+              src={repository.owner.avatar_url}
+              alt={repository.owner.login}
+            />
+            <div>
+              <strong>{repository.full_name}</strong>
+              <p>{repository.description}</p>
+            </div>
 
-          <FiChevronRight size={20} />
-        </a>
+            <FiChevronRight size={20} />
+          </a>
+        ))}
       </Repositories>
     </>
   );
