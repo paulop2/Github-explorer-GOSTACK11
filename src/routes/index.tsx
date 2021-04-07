@@ -7,7 +7,8 @@ import Repository from '../pages/Repository';
 const Routes: React.FC = () => (
   <Switch>
     <Route path="/" exact component={Dashboard} />
-    <Route path="/repository" component={Repository} />
+    {/* :etc para falar q a rota é o depois da barra e o + significa TUDO dps da barra */}
+    <Route path="/repositories/:repository+" component={Repository} />
   </Switch>
 );
 
